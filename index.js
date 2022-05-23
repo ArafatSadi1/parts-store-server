@@ -53,7 +53,7 @@ async function run() {
       res.send(product);
     });
 
-    app.post('/order', async(req, res)=>{
+    app.post('/order', verifyJwt, async(req, res)=>{
         const order = req.body;
         const result = await ordersCollection.insertOne(order);
         res.send(result);
@@ -64,6 +64,12 @@ async function run() {
         res.send(orders);
     })
 
+    app.delete('/order/:id', async(req, res)=>{
+        const id = req.params.id;
+        const filter = {_id: ObjectId(id)};
+        const result = await ordersCollection.deleteOne(filter);
+        res.send(result)
+    })
 
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
