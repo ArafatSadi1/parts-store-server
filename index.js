@@ -39,17 +39,31 @@ async function run() {
 
     const productsCollection = client.db("parts-store").collection("products");
     const usersCollection = client.db("parts-store").collection("users");
+    const ordersCollection = client.db("parts-store").collection("orders");
 
     app.get("/products", async (req, res) => {
       const products = await productsCollection.find({}).toArray();
       res.send(products);
     });
+
     app.get("/product/:id", verifyJwt, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const product = await productsCollection.findOne(filter);
       res.send(product);
     });
+
+    app.post('/order', async(req, res)=>{
+        const order = req.body;
+        const result = await ordersCollection.insertOne(order);
+        res.send(result);
+    })
+
+    app.get('/order', async(req, res)=>{
+        const orders = await ordersCollection.find({}).toArray();
+        res.send(orders);
+    })
+
 
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -75,6 +89,7 @@ async function run() {
 
 
   } finally {
+
   }
 }
 run().catch(console.dir);
