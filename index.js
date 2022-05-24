@@ -43,6 +43,18 @@ async function run() {
     const paymentCollection = client.db("parts-store").collection("payment");
     const reviewCollection = client.db("parts-store").collection("reviews");
 
+    const verifyAdmin = async(req, res, next)=>{
+      const requester = req.decoded.email;
+      const query = {email: requester}
+      const requesterAccount = await usersCollection.findOne(query);
+      if(requesterAccount.role === "admin"){
+        next();
+      }
+      else{
+        res.status(403).send({message: "forbidden"});
+      }
+    }
+
     app.get("/products", async (req, res) => {
       const products = await productsCollection.find({}).toArray();
       res.send(products);
@@ -117,20 +129,41 @@ async function run() {
       res.send(review);
     });
 
+    // add review api
     app.post("/review", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
 
-    app.get("/admin/:email", async(req, res)=>{
+    // get all users api
+    app.get('/users', verifyJwt, verifyAdmin , async(req, res)=>{
+      const users = await usersCollection.find({}).toArray();
+      res.send(users)
+    })
+
+    // make admin api
+    app.put('/user/admin/:email', verifyJwt, verifyAdmin, async(req, res)=>{
+      const email = req.params.email;
+      const filter = {email: email};
+      const updatedDoc = {
+        $set: {
+          role: "admin"
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
+    // useAdmin hooks api
+    app.get("/admin/:email", verifyJwt, async(req, res)=>{
       const email = req.params.email;
       const filter = {email: email};
       const user = await usersCollection.findOne(filter);
       const isAdmin = user.role === "admin";
       res.send({admin: isAdmin});
     })
-
+   
     app.put("/updateUser/:email", verifyJwt, async (req, res) => {
       const updateUser = req.body;
       const { education, address, phone, linkedIn } = updateUser;
