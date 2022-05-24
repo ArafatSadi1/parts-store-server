@@ -42,6 +42,7 @@ async function run() {
     const usersCollection = client.db("parts-store").collection("users");
     const ordersCollection = client.db("parts-store").collection("orders");
     const paymentCollection = client.db("parts-store").collection("payment");
+    const reviewCollection = client.db("parts-store").collection("reviews");
 
     app.get("/products", async (req, res) => {
       const products = await productsCollection.find({}).toArray();
@@ -105,6 +106,17 @@ async function run() {
         const result = await paymentCollection.insertOne({orderId ,transactionId});
         const updatedOrder = await ordersCollection.updateOne(filter, updatedDoc);
         res.send(updatedOrder)
+    })
+
+    app.get('/reviews', async(req,res)=>{
+      const review = (await reviewCollection.find({}).toArray()).reverse();
+      res.send(review);
+    })
+
+    app.post('/review', async(req, res)=>{
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
     })
 
     app.put("/user/:email", async (req, res) => {
