@@ -55,6 +55,12 @@ async function run() {
       }
     }
 
+    app.post('/product', verifyJwt, verifyAdmin, async(req, res)=>{
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.send(result);
+    })
+
     app.get("/products", async (req, res) => {
       const products = await productsCollection.find({}).toArray();
       res.send(products);
