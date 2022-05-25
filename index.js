@@ -61,9 +61,18 @@ async function run() {
       res.send(result);
     })
 
+    // get all products
     app.get("/products", async (req, res) => {
       const products = await productsCollection.find({}).toArray();
       res.send(products);
+    });
+
+    // delete product api
+    app.delete("/product/:id", verifyJwt, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await productsCollection.deleteOne(filter);
+      res.send(result);
     });
 
     app.get("/product/:id", verifyJwt, async (req, res) => {
