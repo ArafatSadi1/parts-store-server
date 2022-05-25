@@ -73,12 +73,33 @@ async function run() {
       res.send(product);
     });
 
+    // get all orders for admin 
+    app.get('/orders', verifyJwt, verifyAdmin, async(req, res)=>{
+      const orders = await ordersCollection.find({}).toArray();
+      res.send(orders);
+    })
+
+    // order shipped api
+    app.patch('/order/shipped/:id', verifyJwt, verifyAdmin, async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: ObjectId(id)};
+      const updatedDoc = {
+        $set: {
+          shipped: true
+        }
+      }
+      const result = await ordersCollection.updateOne(filter, updatedDoc);
+      res.send(result)
+    })
+
+    // add order api
     app.post("/order", verifyJwt, async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
       res.send(result);
     });
 
+    // get specific user order
     app.get("/order/:email", async (req, res) => {
       const email = req.params.email;
       const query = {customerEmail: email};
@@ -86,6 +107,7 @@ async function run() {
       res.send(orders);
     });
 
+    // delete order api
     app.delete("/order/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
