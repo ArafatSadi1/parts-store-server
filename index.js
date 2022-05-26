@@ -63,7 +63,7 @@ async function run() {
 
     // get all products
     app.get("/products", async (req, res) => {
-      const products = await productsCollection.find({}).toArray();
+      const products = (await productsCollection.find({}).toArray()).reverse();
       res.send(products);
     });
 
@@ -112,7 +112,7 @@ async function run() {
     app.get("/order/:email", async (req, res) => {
       const email = req.params.email;
       const query = {customerEmail: email};
-      const orders = await ordersCollection.find(query).toArray();
+      const orders = (await ordersCollection.find(query).toArray()).reverse();
       res.send(orders);
     });
 
