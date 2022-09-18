@@ -1,5 +1,5 @@
 # [Parts Store Server site](https://protected-mountain-80420.herokuapp.com/)
-### Heroku live Server site link [https://protected-mountain-80420.herokuapp.com/](https://protected-mountain-80420.herokuapp.com/)
+### Server site live link [https://parts-store.onrender.com/](https://parts-store.onrender.com/)
 
 ## Five Bullet point about this project
 ### 1. For backend i have used nodejs framework expressJs
